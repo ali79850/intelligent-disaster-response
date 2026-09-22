@@ -1,0 +1,7 @@
+numpy
+pandas
+pillow
+matplotlib
+pyyaml
+python-dotenv
+pytest
