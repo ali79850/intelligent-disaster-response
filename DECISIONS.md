@@ -77,3 +77,15 @@ empty agricultural land.
 building mask-generation code in Phase 3. Building density variation across
 tiles is a factor to consider in patch sampling strategy.
 **Status:** Confirmed via manual visual inspection.
+## 2026-09 — Phase 2: Image Dimensions & GSD Verified
+
+**Finding:** All 5,598 images (pre + post combined) are uniformly 1024x1024
+pixels — confirmed via full scan of all label metadata, not assumed. Ground
+sample distance (gsd) varies from 1.24 to 3.15 m/pixel (avg 2.14) across tiles,
+meaning real-world object scale is not constant across the dataset despite
+uniform pixel dimensions. Disaster events also group into 6 broader
+disaster_type categories: fire, flooding, wind, earthquake, tsunami, volcano.
+**Impact:** No resizing/padding needed for uniform input size in Phase 3.
+GSD variance is a documented limitation — noted for potential normalization
+or as a discussed caveat in error analysis (Phase 6), not addressed now.
+**Status:** Confirmed via full scan of all 5,598 label files.
