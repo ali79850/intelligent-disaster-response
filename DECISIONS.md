@@ -35,3 +35,33 @@ avoided any resume attempt and completed cleanly, hash-verified against the
 published SHA1.
 **Status:** Confirmed. Verified structure: train/images, train/labels,
 train/targets, 5,598 files each (2,799 pre/post pairs).
+## 2026-09 — Phase 2: Label Schema Verified
+
+**Finding:** Actual xBD post-disaster labels contain 5 distinct `subtype` values,
+not 4: `no-damage`, `minor-damage`, `major-damage`, `destroyed`, `un-classified`.
+Verified by scanning all 2,799 post_disaster label JSONs in the downloaded
+training set.
+**Impact:** Phase 0 scope described 4 damage categories based on the general
+xBD paper description. The `un-classified` category's prevalence and handling
+(treat as 5th class vs. exclude vs. separate uncertainty analysis) will be
+decided based on its actual frequency, determined in the next EDA step.
+**Status:** Open — pending class distribution counts.
+
+## 2026-09 — Phase 2: Class Distribution & Imbalance (verified)
+
+**Finding:** Across 162,787 building instances in 2,799 post-disaster tiles:
+no-damage 72.13%, minor-damage 9.20%, major-damage 8.70%, destroyed 8.13%,
+un-classified 1.84%. Distribution varies drastically by disaster event
+(e.g. mexico-earthquake: 99.36% no-damage vs. hurricane-matthew: 18.04%
+no-damage) — disaster-event identity is a strong confound.
+**Impact:**
+1. Severe class imbalance requires weighted/focal loss in Phase 5, and
+   precision/recall/F1/IoU over accuracy in Phase 6 evaluation.
+2. Train/val/test split (Phase 3) must consider holding out entire disaster
+   events, not random tiles, to prevent the model learning event-identity
+   shortcuts instead of visual damage features. Final split strategy to be
+   decided in Phase 3 with full reasoning documented.
+3. un-classified (1.84% overall) will likely be excluded from training/
+   evaluation as a simplification, pending a closer look — this is a
+   decision, not a default, and will be recorded separately when made.
+**Status:** Confirmed via full scan of all 2,799 post-disaster label files.
