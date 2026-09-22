@@ -65,3 +65,15 @@ no-damage) — disaster-event identity is a strong confound.
    evaluation as a simplification, pending a closer look — this is a
    decision, not a default, and will be recorded separately when made.
 **Status:** Confirmed via full scan of all 2,799 post-disaster label files.
+## 2026-09 — Phase 2: Coordinate/Polygon Alignment Verified
+
+**Finding:** Visual inspection of hurricane-matthew_00000000_post_overlay.png
+confirms features.xy WKT polygons correctly align with real building footprints
+in the image (polygons trace the actual settlement cluster, not scattered over
+empty fields). Also confirmed: building density varies enormously by tile —
+this sample tile is a sparse rural riverside settlement, most of the frame is
+empty agricultural land.
+**Impact:** Confirms our WKT-to-pixel-polygon parsing logic is correct before
+building mask-generation code in Phase 3. Building density variation across
+tiles is a factor to consider in patch sampling strategy.
+**Status:** Confirmed via manual visual inspection.
