@@ -14,10 +14,14 @@
 ```cmd
    certutil -hashfile train_images_labels_targets.tar SHA1
 ```
-5. Extract (this is a plain, uncompressed tar despite the `.tar.gz`-style URL):
+5. Extract and move into place:
 ```cmd
+   mkdir data\raw\xbd_extract_temp
    tar -xf train_images_labels_targets.tar -C data\raw\xbd_extract_temp
+   mkdir data\raw\xbd
    move data\raw\xbd_extract_temp\train data\raw\xbd\train
+   rmdir data\raw\xbd_extract_temp
+   del train_images_labels_targets.tar
 ```
 6. Verified resulting structure:
 data/raw/xbd/train/images/ — 5,598 PNGs (pre + post disaster tiles combined)
