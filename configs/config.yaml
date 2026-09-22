@@ -1,0 +1,12 @@
+project:
+  name: "intelligent-disaster-response"
+  version: "0.1.0-dev"
+
+paths:
+  data_raw: "data/raw"
+  data_interim: "data/interim"
+  data_processed: "data/processed"
+  models: "models"
+  reports: "reports"
+
+seed: 42
