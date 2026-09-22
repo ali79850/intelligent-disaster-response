@@ -1,28 +1,31 @@
-# Reproducibility Guide
-
-> This document is filled in progressively. Currently covers environment setup
-> and dataset acquisition only (Phase 1).
-
-## 1. Environment Setup (Windows / cmd)
-
-```cmd
-python -m venv .venv
-.venv\Scripts\activate.bat
-pip install -r requirements.txt
-```
-
-Python version used in development: **3.13** (confirm exact patch version via `python --version`)
-
 ## 2. Dataset Acquisition
 
-1. Register at https://xview2.org
-2. Download the **Tier1 training set** (do not download Tier3/holdout yet)
-3. Extract into `data/raw/xbd/` such that the structure is:
-data/raw/xbd/train/images/
-data/raw/xbd/train/labels/
-
-4. Do **not** commit this data to git — excluded via `.gitignore`, and its
+1. Go to https://xview2.org → DATASET tab → "Datasets from the Challenge" section.
+2. Right-click "Download Challenge training set" → Copy link address (the direct
+   download link is a time-limited signed URL generated per page load — do not
+   reuse an old one).
+3. Download via curl rather than the browser to avoid resumable-download failures
+   against the signed URL's expiry window:
+```cmd
+   curl -L -o train_images_labels_targets.tar "PASTE_COPIED_URL"
+```
+   Expected size: ~7.8 GB. Expected SHA1: `b37a4ef4ee9c909e2b19d046e49d42ee3965714b`
+4. Verify integrity before extracting:
+```cmd
+   certutil -hashfile train_images_labels_targets.tar SHA1
+```
+5. Extract (this is a plain, uncompressed tar despite the `.tar.gz`-style URL):
+```cmd
+   tar -xf train_images_labels_targets.tar -C data\raw\xbd_extract_temp
+   move data\raw\xbd_extract_temp\train data\raw\xbd\train
+```
+6. Verified resulting structure:
+data/raw/xbd/train/images/ — 5,598 PNGs (pre + post disaster tiles combined)
+data/raw/xbd/train/labels/ — 5,598 JSONs (building polygon + damage annotations)
+data/raw/xbd/train/targets/ — 5,598 PNGs (pre-rendered damage mask targets)
+   Filename convention: `{disaster-event}_{tile-id:08d}_{pre|post}_disaster.png`,
+   e.g. `guatemala-volcano_00000000_pre_disaster.png`. 5,598 files = 2,799 pre/post
+   pairs across the disaster events included in the Challenge training split.
+7. Do **not** commit this data to git — excluded via `.gitignore`, and its
    CC BY-NC-SA 3.0 license does not permit redistribution here.
-
-*(Preprocessing, training, evaluation, and inference sections added in their
-respective phases.)*
+      

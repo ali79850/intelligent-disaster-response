@@ -23,3 +23,15 @@ adding heavier dependencies (PyTorch, OpenCV, GeoPandas) only in the phases that
 **Note:** Development environment uses Python 3.13 (cp313 wheels observed during
 pip install). PyTorch/GeoPandas/Rasterio compatibility with 3.13 will be verified
 explicitly, not assumed, when those dependencies are introduced (Phases 5 and 8).
+
+## 2026-09 — Phase 1: Dataset Download Method
+
+**Decision:** Download xBD Challenge training set via `curl` in a single
+continuous request rather than the browser's download manager.
+**Reason:** The signed download URL (AWS CloudFront, time-limited `Expires`
+parameter) failed with HTTP 403 "Forbidden" when the browser paused/resumed
+the transfer near completion (~96%). A single uninterrupted `curl` request
+avoided any resume attempt and completed cleanly, hash-verified against the
+published SHA1.
+**Status:** Confirmed. Verified structure: train/images, train/labels,
+train/targets, 5,598 files each (2,799 pre/post pairs).
