@@ -232,3 +232,16 @@ shapes. Confirmed val split with augment=False loads without augmentation
 applied, as intended.
 **Status:** Confirmed. Dataset class with augmentation support is complete
 and verified end-to-end.
+## 2026-09 — Phase 3: DataLoader Implemented and Verified
+
+**Finding:** DataLoader with batch_size=2, num_workers=0, shuffle=True (train)
+verified: correct batch dimension on all tensors ((2,3,1024,1024) images,
+(2,1024,1024) masks), correct shuffling (distinct random base names per
+batch). Measured throughput: ~0.50s/batch data loading alone, implying
+~7.4 minutes/epoch for data loading on this CPU-only setup before any
+model computation is added.
+**Impact:** This is a real, measured baseline for planning Phase 5 training
+time budgets - not an assumption. If model forward/backward pass adds
+significantly more time per batch, full training runs may need to move to
+Colab/Kaggle GPU rather than local CPU, per the Phase 0 hardware plan.
+**Status:** Confirmed. Phase 3 (preprocessing & data pipeline) complete.
