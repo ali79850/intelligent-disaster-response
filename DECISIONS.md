@@ -126,3 +126,36 @@ macro/weighted F1 and full test-set results will be the primary basis for
 model comparison, not per-class val curves in isolation. This caveat will
 be documented in the final results/limitations section.
 **Status:** Confirmed.
+## 2026-09 — Phase 3: Un-classified Building Handling
+
+**Decision:** Rasterize un-classified buildings (1.84% of all instances) as
+their own pixel value in segmentation masks, but exclude them from loss
+computation and evaluation metrics via a pixel-level ignore mask.
+**Alternatives considered:**
+- Treat as a 6th real class the model must learn — rejected because
+  un-classified reflects human annotator uncertainty, not a distinct visual
+  damage pattern, and would add noisy/unlearnable signal to training.
+- Rasterize as background — rejected because it silently erases real
+  buildings from the mask, which could mislead debugging/visualization later
+  (a building appears to not exist rather than "exists, unknown label").
+**Reason for chosen option:** Keeps ground truth visually honest (all real
+buildings appear in the mask) while not penalizing or rewarding the model
+for a category that isn't a principled learning target.
+**Class-to-pixel-value mapping (final):**
+  0 = background, 1 = no-damage, 2 = minor-damage, 3 = major-damage,
+  4 = destroyed, 5 = un-classified (ignored in loss/metrics via ignore mask)
+**Status:** Confirmed.
+## 2026-09 — Phase 3: Pixel-Level Class Distribution (Segmentation Masks)
+
+**Finding:** Generated segmentation masks for all 2,799 post-disaster tiles.
+Pixel-level distribution: background 94.12%, no-damage 4.30%, minor-damage
+0.53%, major-damage 0.68%, destroyed 0.32%, un-classified 0.05%. This is far
+more extreme than the building-instance-level distribution from Phase 2
+(no-damage 72.13% there) — most of a satellite tile's area is non-building
+ground (roads, fields, water), not damage-relevant pixels.
+**Impact:** Confirms plain per-pixel cross-entropy loss is unusable — a
+model predicting all-background achieves ~94% pixel accuracy while learning
+nothing. Phase 5 will require class-weighted loss and/or Dice/focal loss,
+and Phase 6 evaluation must report per-class IoU/F1, never overall pixel
+accuracy as a headline metric.
+**Status:** Confirmed via full mask generation over all 2,799 tiles.
