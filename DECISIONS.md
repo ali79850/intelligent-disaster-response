@@ -159,3 +159,13 @@ nothing. Phase 5 will require class-weighted loss and/or Dice/focal loss,
 and Phase 6 evaluation must report per-class IoU/F1, never overall pixel
 accuracy as a headline metric.
 **Status:** Confirmed via full mask generation over all 2,799 tiles.
+## 2026-09 — Phase 3: Mask Generation Visually Verified
+
+**Finding:** Blended overlay of generated mask on source image
+(hurricane-matthew_00000000) confirms mask regions align exactly with the
+same building cluster verified in the earlier polygon overlay check.
+Colors match expected damage profile (predominantly minor-damage/yellow,
+some destroyed/red). Individual building shapes are distinct, not merged -
+confirms polygon rasterization has no overlap/fill-rule bug.
+**Status:** Confirmed via visual inspection. Mask generation pipeline
+verified end-to-end (schema -> coordinates -> rasterization -> visual check).
