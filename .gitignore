@@ -9,13 +9,17 @@ env/
 # Jupyter
 .ipynb_checkpoints/
 
-# Data (never commit datasets)
+# Data (never commit raw/processed imagery datasets)
 data/raw/*
 data/interim/*
 data/processed/*
 !data/raw/.gitkeep
 !data/interim/.gitkeep
 !data/processed/.gitkeep
+
+# Exception: split file lists are small, critical for reproducibility
+!data/interim/splits/
+!data/interim/splits/*.txt
 
 # Models (never commit large checkpoints)
 models/*

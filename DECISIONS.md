@@ -89,3 +89,40 @@ disaster_type categories: fire, flooding, wind, earthquake, tsunami, volcano.
 GSD variance is a documented limitation — noted for potential normalization
 or as a discussed caveat in error analysis (Phase 6), not addressed now.
 **Status:** Confirmed via full scan of all 5,598 label files.
+## 2026-09 — Phase 3: Train/Val/Test Split Strategy
+
+**Decision:** Event-based (grouped) split rather than random tile split.
+- Train: socal-fire, hurricane-michael, hurricane-florence, midwest-flooding,
+  guatemala-volcano (1,782 tiles, 63.7%)
+- Val: hurricane-harvey, mexico-earthquake (440 tiles, 15.7%)
+- Test: hurricane-matthew, santa-rosa-wildfire, palu-tsunami (577 tiles, 20.6%)
+**Reason:** Phase 2 EDA showed disaster-event identity strongly correlates with
+damage-class distribution (e.g. mexico-earthquake 99% no-damage vs.
+hurricane-matthew 18%). A random tile split risks the model learning
+event-identity shortcuts instead of visual damage cues. This split ensures
+val (earthquake) and test (tsunami) each include a disaster_type never seen
+in train, directly testing generalization to unseen disaster types.
+**Trade-offs:** Train is 63.7% of tiles, below the ~70% target, due to event
+granularity constraints. guatemala-volcano (18 tiles) is too small to serve
+as a reliable held-out set, so volcano-type damage is never evaluated in
+val/test — a documented limitation, not an oversight. Class balance across
+splits will differ since grouping is event-based, not stratified by damage
+class — to be measured, not assumed, in the next step.
+**Status:** Approved by user.
+## 2026-09 — Phase 3: Split Class Imbalance — Kept As-Is
+
+**Finding:** Generated splits show val set has only 0.73% destroyed-class
+buildings (403 instances) vs. 18.16% in test — a direct consequence of val
+including mexico-earthquake (99.36% no-damage per Phase 2 EDA).
+**Decision:** Keep the event-based split unchanged rather than reshuffle
+events to balance class distribution.
+**Reason:** Reshuffling to produce a more convenient class balance would
+undermine the split's purpose (honest generalization testing) and risks
+being a form of metric-shopping. The imbalance is a real, disclosable
+property of testing against an authentic unseen disaster event.
+**Mitigation:** Val-set destroyed-class metrics will be treated as low-
+confidence signals during training (too few examples for stability);
+macro/weighted F1 and full test-set results will be the primary basis for
+model comparison, not per-class val curves in isolation. This caveat will
+be documented in the final results/limitations section.
+**Status:** Confirmed.
