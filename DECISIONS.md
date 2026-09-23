@@ -201,3 +201,12 @@ CUDA unavailable as expected (no dedicated GPU on this machine).
 Phase 0's hardware plan. GPU training (Colab/Kaggle) remains available for
 Phase 5 if local CPU training proves too slow for full-scale experiments.
 **Status:** Confirmed.
+## 2026-09 — Phase 3: XBDDataset Class Implemented and Verified
+
+**Finding:** src/data/xbd_dataset.py implemented and verified against all
+three splits: correct sample counts (1782/440/577), correct tensor shapes
+((3,1024,1024) images, (1024,1024) masks), correct dtypes (float32/int64),
+and confirmed un-classified remapping (raw value 5 -> ignore_index 255)
+via guatemala-volcano_00000025, a tile known to contain un-classified
+buildings from Phase 2 EDA.
+**Status:** Confirmed. Dataset class ready for DataLoader integration.
