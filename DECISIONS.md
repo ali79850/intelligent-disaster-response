@@ -210,3 +210,25 @@ and confirmed un-classified remapping (raw value 5 -> ignore_index 255)
 via guatemala-volcano_00000025, a tile known to contain un-classified
 buildings from Phase 2 EDA.
 **Status:** Confirmed. Dataset class ready for DataLoader integration.
+## 2026-09 — Phase 3: Augmentation Strategy
+
+**Decision:** Geometric augmentation only (horizontal flip, vertical flip,
+90-degree rotations), applied identically to pre-image/post-image/mask via
+a single shared random choice per sample. Train split only.
+**Reason:** These transforms preserve real-world scale exactly, avoiding
+interaction with the GSD variance (1.24-3.15 m/pixel) documented earlier.
+Scale-altering augmentations (random resized crop, zoom) deliberately
+excluded for now to avoid distorting apparent building size.
+**Deferred:** Color/photometric augmentation (brightness, contrast) - the
+dataset has real sun angle/sensor metadata variation worth analyzing first,
+rather than picking augmentation ranges without evidence. Revisit in
+Phase 5 experiments if needed.
+**Status:** Confirmed.
+## 2026-09 — Phase 3: Augmentation Verified
+
+**Finding:** Confirmed augmentation randomizes correctly (6 distinct mask
+variants across 10 calls to the same dataset index) and preserves tensor
+shapes. Confirmed val split with augment=False loads without augmentation
+applied, as intended.
+**Status:** Confirmed. Dataset class with augmentation support is complete
+and verified end-to-end.

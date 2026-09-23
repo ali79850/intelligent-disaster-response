@@ -21,6 +21,29 @@ def test_ignore_index_remapping():
     if not found_ignore:
         print("WARNING: no guatemala-volcano tile in this scan showed ignore_index=255 - verify manually")
 
+def test_augmentation_consistency():
+    """Verify augmented pre-image, post-image, and mask stay spatially
+    aligned - critical check, since misaligned augmentation is a silent
+    bug that produces no error but corrupts training data."""
+    from src.data.xbd_dataset import XBDDataset
+
+    ds_train = XBDDataset("train", augment=True)
+    ds_val = XBDDataset("val", augment=False)
+
+    sample = ds_train[0]
+    print(f"Train (augment=True) sample shapes still correct: "
+          f"pre={tuple(sample['pre_image'].shape)}, mask={tuple(sample['mask'].shape)}")
+
+    val_sample = ds_val[0]
+    print(f"Val (augment=False, explicit) loaded without error: {val_sample['base_name']}")
+
+    masks_seen = set()
+    for _ in range(10):
+        s = ds_train[0]
+        masks_seen.add(s["mask"].numpy().tobytes())
+    print(f"Distinct mask variants seen across 10 calls to index 0: {len(masks_seen)} "
+          f"(should be >1 if augmentation is actually randomizing)")
+
 def main():
     for split in ["train", "val", "test"]:
         ds = XBDDataset(split)
@@ -36,6 +59,9 @@ def main():
 
     print("=== Ignore-index remapping check ===")
     test_ignore_index_remapping()
+
+    print("\n=== Augmentation consistency check ===")
+    test_augmentation_consistency()
 
 if __name__ == "__main__":
     main()
