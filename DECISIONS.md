@@ -176,3 +176,17 @@ test (577) splits have complete pre-image, post-image, post-disaster label,
 and generated mask files. Zero missing files found.
 **Status:** Confirmed via full scan. Safe to proceed to Dataset/DataLoader
 implementation.
+## 2026-09 — Phase 3: Dataset Normalization Statistics Computed
+
+**Decision:** Use dataset-specific mean/std (computed from train split, pre+
+post images combined) for normalization, rather than ImageNet statistics.
+**Computed values (RGB, [0,1] scale):**
+  mean: [0.2920, 0.3253, 0.2438]
+  std:  [0.1571, 0.1397, 0.1314]
+**Reason:** Satellite imagery has a measurably different intensity/color
+distribution than ImageNet's natural photographs (our means are notably
+lower/darker). Computed only from train split to avoid val/test leakage
+into normalization statistics.
+**Impact:** These constants will be stored in configs/config.yaml and
+referenced from there in the Dataset class — not hardcoded inline.
+**Status:** Confirmed.

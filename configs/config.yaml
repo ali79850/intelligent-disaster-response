@@ -10,3 +10,7 @@ paths:
   reports: "reports"
 
 seed: 42
+
+normalization:
+  mean: [0.2920, 0.3253, 0.2438]
+  std: [0.1571, 0.1397, 0.1314]
