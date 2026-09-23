@@ -5,3 +5,5 @@ matplotlib
 pyyaml
 python-dotenv
 pytest
+torch
+torchvision

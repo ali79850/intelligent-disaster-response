@@ -32,4 +32,10 @@ data/raw/xbd/train/targets/ — 5,598 PNGs (pre-rendered damage mask targets)
    pairs across the disaster events included in the Challenge training split.
 7. Do **not** commit this data to git — excluded via `.gitignore`, and its
    CC BY-NC-SA 3.0 license does not permit redistribution here.
+   **Note on PyTorch:** Install separately with the CPU-specific index to avoid
+pulling unnecessary CUDA dependencies:
+```cmd
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+```
+Verified working: torch 2.14.0+cpu on Python 3.13.15, Windows.
       

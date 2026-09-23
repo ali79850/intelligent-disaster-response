@@ -189,4 +189,15 @@ lower/darker). Computed only from train split to avoid val/test leakage
 into normalization statistics.
 **Impact:** These constants will be stored in configs/config.yaml and
 referenced from there in the Dataset class — not hardcoded inline.
+**Status:** Confirmed.## 2026-09 — Phase 3: PyTorch Installed (CPU-only)
+
+**Decision:** Install PyTorch CPU build via
+`pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu`
+**Verification:** Some older community reports suggested PyTorch lacked
+Python 3.13 wheel support on Windows; this was checked directly rather than
+assumed. Install succeeded cleanly: torch 2.14.0+cpu, imports correctly,
+CUDA unavailable as expected (no dedicated GPU on this machine).
+**Impact:** Local development/training will run CPU-only, consistent with
+Phase 0's hardware plan. GPU training (Colab/Kaggle) remains available for
+Phase 5 if local CPU training proves too slow for full-scale experiments.
 **Status:** Confirmed.
