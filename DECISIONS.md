@@ -270,3 +270,10 @@ shows damage does cause some detectable pixel change, but the signal is
 overwhelmed by noise. This result is reported honestly as the floor to
 beat — poor baseline performance here is expected and useful, not hidden.
 **Status:** Confirmed. Establishes Baseline 1 floor for later comparison.
+## 2026-09 — Phase 4: Polygon Utility Verified
+
+**Finding:** src/preprocessing/polygon_utils.py verified against
+hurricane-matthew_00000000 - correctly extracts 105 buildings with
+non-zero pixel counts and correct subtype labels, consistent with prior
+visual verification of this same tile (predominantly minor-damage).
+**Status:** Confirmed. Ready for feature extraction (Baseline 2).
