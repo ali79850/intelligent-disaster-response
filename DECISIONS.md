@@ -245,3 +245,28 @@ time budgets - not an assumption. If model forward/backward pass adds
 significantly more time per batch, full training runs may need to move to
 Colab/Kaggle GPU rather than local CPU, per the Phase 0 hardware plan.
 **Status:** Confirmed. Phase 3 (preprocessing & data pipeline) complete.
+## 2026-09 — Phase 4: Polygon Utility Scope
+
+**Decision:** Build polygon-to-pixel-mask/crop utilities as reusable code
+under src/preprocessing/, not scoped narrowly to Baseline 2 only.
+**Reason:** Per-building feature extraction is needed for Baseline 2 now,
+and will be needed again for per-building evaluation/statistics in later
+phases (building-level damage reporting, per your original project scope).
+Building it once, reusably, avoids duplicating polygon-parsing logic.
+**Status:** Confirmed.
+## 2026-09 — Phase 4: Baseline 1 (Naive Pixel-Diff) — Results
+
+**Method:** Absolute grayscale pixel difference between pre/post images,
+threshold=30, evaluated as binary change detection against collapsed
+ground truth (no-damage vs. any real damage).
+**Results (test set, 577 tiles):** Precision 0.0386, Recall 0.4972,
+F1 0.0716, IoU 0.0372. TP=6,023,700 FP=150,021,694 FN=6,091,284
+TN=442,481,569.
+**Interpretation:** Extremely low precision (25:1 false-positive ratio)
+confirms raw pixel differencing cannot distinguish real damage from
+confounds like shadows, sun-angle variation between capture dates,
+vegetation change, and imperfect image registration. Recall near 50%
+shows damage does cause some detectable pixel change, but the signal is
+overwhelmed by noise. This result is reported honestly as the floor to
+beat — poor baseline performance here is expected and useful, not hidden.
+**Status:** Confirmed. Establishes Baseline 1 floor for later comparison.
