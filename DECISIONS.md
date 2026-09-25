@@ -407,3 +407,21 @@ connections completely failing on minority classes is exactly the kind of
 evidence that justifies the more sophisticated architecture, rather than
 choosing it for complexity's sake.
 **Status:** Confirmed, reported honestly despite poor performance.
+## 2026-09 — Phase 5: U-Net Architecture Implemented and Verified
+
+**Decision:** UNetResNet18 - ResNet-18 encoder (ImageNet-pretrained),
+U-Net-style decoder with skip connections at 4 resolution levels, 6-channel
+input (concatenated pre+post images, first conv layer modified with
+duplicated pretrained weights across the extra channels).
+**Reason:** Directly addresses Baseline 3's diagnosed failure (Phase 4) -
+severe downsampling with no skip connections caused complete collapse on
+minority damage classes. Skip connections let fine spatial detail bypass
+the bottleneck.
+**Pretrained weights:** ResNet-18 ImageNet1K_V1 weights, source: torchvision.
+Used for general low/mid-level visual feature transfer (edges, textures)
+from natural images - NOT domain-specific satellite imagery knowledge.
+Documented per working rule L (responsible pretrained weight use).
+**Verification:** Output shape (2,5,1024,1024) confirmed correct on real
+batch. Total parameters: 14,344,741 (vs Baseline 3's 91,285).
+**Status:** Confirmed correct. Proceeding to loss function design and
+smoke test before any full training.
