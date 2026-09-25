@@ -298,3 +298,25 @@ being diagnosed; no data was lost since train had already completed and
 was written incrementally, but this cost real wall-clock time. Worth
 building smaller smoke-test runs (e.g., 10 tiles) before launching a full
 dataset pass on new preprocessing code going forward.**
+## 2026-09 — Phase 4: Baseline 2 (Random Forest) — Results
+
+**Method:** Random forest (200 trees, class_weight='balanced') on 8
+hand-crafted per-building features (grayscale diff stats, area, edge
+density), predicting 4-class damage severity.
+**Results (test set, 57,045 buildings):** Accuracy 0.61, macro F1 0.31,
+weighted F1 0.58. Per-class F1: no-damage 0.78, destroyed 0.26,
+minor-damage 0.15, major-damage 0.06.
+**Interpretation:** No-damage is learnable from simple statistics; all real
+damage classes are weak. Feature importances are nearly uniform (0.117-
+0.137 across all 8 features) - no single hand-crafted feature dominates,
+suggesting these simple grayscale/edge statistics are fundamentally
+limited descriptors for this task, not just poorly chosen. Confusion
+matrix shows 6,908 of 10,584 actual destroyed buildings misclassified as
+no-damage - a serious practical failure mode.
+**Val vs test discrepancy:** macro F1 0.21 (val) vs 0.31 (test) - consistent
+with the Phase 3 finding that val's destroyed class has only 403 instances,
+making its per-class metrics unreliable. Test set is the trusted number.
+**Status:** Confirmed. Establishes Baseline 2 floor - meaningfully better
+than Baseline 1's noise-dominated binary output, but inadequate for the
+real task. Motivates a learned deep model (Baseline 3 / Phase 5) that can
+capture spatial/textural patterns simple statistics cannot.
