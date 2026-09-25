@@ -277,3 +277,24 @@ hurricane-matthew_00000000 - correctly extracts 105 buildings with
 non-zero pixel counts and correct subtype labels, consistent with prior
 visual verification of this same tile (predominantly minor-damage).
 **Status:** Confirmed. Ready for feature extraction (Baseline 2).
+## 2026-09 — Phase 4: Feature Extraction — Performance Bug Found and Fixed
+
+**Finding:** Initial extract_building_features.py implementation computed
+Sobel edge detection over the full 1024x1024 image separately for every
+building in a tile, rather than once per tile. On dense tiles (500+
+buildings), this caused the script to hang for 8+ hours with no progress
+on val/test splits after train completed normally.
+**Fix:** Refactored to compute the Sobel edge map once per image (pre and
+post), then index into it per building via the polygon mask - same pattern
+already correctly used for mean_diff/mean_pre/mean_post.
+**Result:** val (440 tiles, 54,921 buildings) and test (577 tiles, 57,045
+buildings) completed in minutes after the fix. Total: 159,794 buildings
+with features extracted (train 47,828 + val 54,921 + test 57,045),
+consistent with ~163k total buildings minus ~3k excluded un-classified.
+**Status:** Confirmed. Lesson: watch for per-item recomputation of
+image-level operations inside per-building/per-polygon loops.
+**Impact for the record - the process was left running overnight before
+being diagnosed; no data was lost since train had already completed and
+was written incrementally, but this cost real wall-clock time. Worth
+building smaller smoke-test runs (e.g., 10 tiles) before launching a full
+dataset pass on new preprocessing code going forward.**
