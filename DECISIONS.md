@@ -320,3 +320,58 @@ making its per-class metrics unreliable. Test set is the trusted number.
 than Baseline 1's noise-dominated binary output, but inadequate for the
 real task. Motivates a learned deep model (Baseline 3 / Phase 5) that can
 capture spatial/textural patterns simple statistics cannot.
+## 2026-09 — Phase 4: Baseline 3 Compute Plan
+
+**Decision:** Train Baseline 3 (simple CNN) CPU-only, locally. Defer Colab/
+GPU setup to Phase 5, where the more sophisticated architecture will
+actually need it.
+**Reason:** Baseline 3 is deliberately small/simple; CPU training is
+feasible within reasonable time given our measured ~7.4 min/epoch data
+loading throughput from Phase 3, especially with a small epoch count.
+**Status:** Confirmed.
+## 2026-09 — Phase 4: SimpleCNN Architecture Verified
+
+**Finding:** SimpleCNN (108,533 parameters, no skip connections) produces
+correct output shape (2, 5, 1024, 1024) on a real batch through the
+verified DataLoader. Ready for training.
+**Status:** Confirmed.
+## 2026-09 — Phase 4: Training Loop Smoke Test Passed
+
+**Finding:** SimpleCNN trained on 5 tiles for 10 iterations shows clean,
+monotonic loss decrease (1.8766 -> 1.1590), confirming model, loss
+(class-weighted CrossEntropy, ignore_index=255), and optimizer are wired
+correctly before committing to a full training run.
+**Status:** Confirmed. Applying the lesson from the feature-extraction
+hang: verify at small scale before scaling up.
+## 2026-09 — Phase 4: SimpleCNN Performance Issue Found
+
+**Finding:** Initial SimpleCNN architecture measured at ~4.2s/batch during
+real training (confirmed via two consistent checkpoints: 419.3s/100 batches,
+843.1s/200 batches), extrapolating to ~62 min/epoch - far too slow for the
+"deliberately simple baseline" this is meant to be, and risks another
+multi-hour unattended run.
+**Cause:** Full 1024x1024 resolution convolutions in the first encoder
+block, bottleneck output, and final decoder block are computationally
+expensive even with small channel counts (16-64), since spatial size was
+not reduced early enough.
+**Fix:** Add a strided/pooled downsampling step before the first conv
+block so most computation happens on smaller feature maps (e.g., downsample
+to 256x256 or lower before the main conv stack), only upsampling back to
+full resolution at the very end.
+**Status:** In progress - re-verifying correctness and speed after fix.
+## 2026-09 — Phase 4: SimpleCNN Revised Architecture Verified
+
+**Finding:** Revised SimpleCNN (stride-4 stem downsampling to 256x256
+before the main conv stack, single upsample back to 1024x1024 at the end)
+verified correct: output shape (2,5,1024,1024) unchanged, parameter count
+91,285 (down from 108,533), and smoke test shows clean monotonic loss
+decrease (1.5507 -> 1.0568 over 10 iterations on 5 tiles).
+**Status:** Confirmed correct. Proceeding to re-measure training speed.
+## 2026-09 — Phase 4: Baseline 3 Training Complete
+
+**Finding:** SimpleCNN trained for 3 epochs on full train set (1782 tiles).
+Loss: epoch 1 = 1.0500 (24.0 min), epoch 2 = 0.9430 (23.4 min), epoch 3 =
+0.8896 (16.5 min, unexplained speedup - not investigated further, not
+concerning for a baseline). Consistent decreasing trend with diminishing
+returns, as expected. All three epoch checkpoints saved to models/.
+**Status:** Confirmed. Proceeding to evaluation on val/test.
