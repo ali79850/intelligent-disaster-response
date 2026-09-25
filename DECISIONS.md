@@ -432,3 +432,15 @@ give loss=0.0004 - confirms the loss function mathematically rewards
 correct predictions and properly excludes ignored pixels. Backward pass
 succeeds with no NaN gradients.
 **Status:** Confirmed. Ready for smoke test on the real U-Net model.
+## 2026-09 — Phase 5: Local CPU Training Confirmed Infeasible for U-Net
+
+**Finding:** Smoke test measured ~8.2s/sample average for UNetResNet18
+(14.3M params) with combined loss, on CPU. Extrapolated to batch_size=2,
+891 batches/epoch: ~4 hours/epoch, 12+ hours for even 3 epochs.
+**Decision:** Move to Google Colab (free GPU tier) for all U-Net training,
+per the Phase 0 hardware plan ("training can use Google Colab/Kaggle GPU
+if necessary"). Local CPU remains used for correctness verification via
+smoke tests only (as just demonstrated), never for full training runs on
+this architecture.
+**Status:** Confirmed. Proceeding to prepare Colab-compatible training
+setup.
