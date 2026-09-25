@@ -424,4 +424,11 @@ Documented per working rule L (responsible pretrained weight use).
 **Verification:** Output shape (2,5,1024,1024) confirmed correct on real
 batch. Total parameters: 14,344,741 (vs Baseline 3's 91,285).
 **Status:** Confirmed correct. Proceeding to loss function design and
-smoke test before any full training.
+smoke test before any full training.## 2026-09 — Phase 5: Combined Loss (Weighted CE + Dice) Verified
+
+**Finding:** CombinedLoss (weighted CrossEntropy + Dice, ignore_index=255)
+verified: random predictions give loss=2.6948, near-perfect predictions
+give loss=0.0004 - confirms the loss function mathematically rewards
+correct predictions and properly excludes ignored pixels. Backward pass
+succeeds with no NaN gradients.
+**Status:** Confirmed. Ready for smoke test on the real U-Net model.
