@@ -444,3 +444,18 @@ smoke tests only (as just demonstrated), never for full training runs on
 this architecture.
 **Status:** Confirmed. Proceeding to prepare Colab-compatible training
 setup.
+## 2026-09 — Phase 5: Colab Data Strategy
+
+**Decision:** Colab notebook downloads the xBD Challenge training set
+directly from xview2.org (same curl command used locally) and regenerates
+masks/splits using our already-verified scripts, rather than uploading a
+pre-processed package from local storage to Google Drive.
+**Reason:** Colab has much better bandwidth than a typical home upload
+connection, avoiding the slow-upload bottleneck (8.28GB package). Also
+more reproducible - the notebook demonstrates the same documented,
+verified pipeline (download -> generate masks -> generate splits) rather
+than depending on a private Drive link only the author has access to.
+**Trade-off:** Mask generation (a few minutes, not hours - verified in
+Phase 3) must re-run each fresh Colab session, since only Google Drive
+persists between sessions, not Colab's local disk.
+**Status:** Confirmed.
