@@ -375,3 +375,35 @@ Loss: epoch 1 = 1.0500 (24.0 min), epoch 2 = 0.9430 (23.4 min), epoch 3 =
 concerning for a baseline). Consistent decreasing trend with diminishing
 returns, as expected. All three epoch checkpoints saved to models/.
 **Status:** Confirmed. Proceeding to evaluation on val/test.
+## 2026-09 — Phase 4: Evaluation Script Memory Bug
+
+**Finding:** evaluate_baseline3.py crashed with ArrayMemoryError trying to
+concatenate all ~461 million pixels from the val set into single arrays
+before computing metrics (~7GB simultaneous memory for predictions+targets).
+**Fix:** Accumulate a running confusion matrix per batch instead of storing
+raw pixel arrays - constant memory regardless of dataset size, standard
+practice for large-scale segmentation evaluation.
+**Status:** Fixing now.
+## 2026-09 — Phase 4: Baseline 3 (Simple CNN) — Results
+
+**Method:** SimpleCNN (91,285 params, stride-4 stem + pooling to 64x64
+bottleneck, no skip connections), trained 3 epochs, class-weighted
+CrossEntropy loss, ignore_index=255.
+**Results (test set):** Macro F1 0.2719. Per-class F1: background 0.9450,
+no-damage 0.4144, minor-damage 0.0000, major-damage 0.0000, destroyed
+0.0000. Confusion matrix confirms the model NEVER predicts minor/major/
+destroyed at all - complete collapse to a 2-class (background vs no-damage)
+output despite class-weighted loss.
+**Interpretation:** Comparable macro F1 to Baseline 2 (0.31) but the
+failure mode is more severe - Baseline 2 at least partially learned
+destroyed/minor classes. Hypothesis (not yet confirmed): the aggressive
+16x spatial downsampling (1024->64 at bottleneck) with no skip connections
+likely destroys fine spatial detail needed to detect small, localized
+damage signals, which the earlier polygon analysis (Phase 4 Baseline 2
+prep) showed can be as small as 141-292 pixels. This directly motivates
+Phase 5's use of a real U-Net-style architecture WITH skip connections,
+rather than being an incidental result - a baseline without skip
+connections completely failing on minority classes is exactly the kind of
+evidence that justifies the more sophisticated architecture, rather than
+choosing it for complexity's sake.
+**Status:** Confirmed, reported honestly despite poor performance.
