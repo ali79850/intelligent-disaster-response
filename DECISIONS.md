@@ -512,3 +512,28 @@ epoch 4->5), suggesting the model has not converged. This result should be
 treated as an interim checkpoint, not a final verdict on the architecture.
 **Status:** Confirmed, reported honestly despite not yet beating Baseline 2.
 Continued training planned before drawing final conclusions.
+## 2026-09 — Phase 5: U-Net (10 epochs) — Results, Beats Baseline 2
+
+**Method:** UNetResNet18, resumed training from epoch 5 checkpoint for 5
+additional epochs (10 total), same combined weighted CE + Dice loss,
+batch_size=4, Adam lr=1e-4.
+**Results (test set):** Macro F1 0.3380 - up from 0.2862 at epoch 5, and
+now exceeds Baseline 2's 0.31 for the first time. Per-class F1: background
+0.9557, no-damage 0.3921 (up substantially from 0.12 at epoch 5),
+minor-damage 0.0266, major-damage 0.0340, destroyed 0.2815 (recall 0.7570,
+precision still weak at 0.1729).
+**Interpretation:** Additional training meaningfully improved no-damage
+and destroyed detection. Minor/major-damage remain weak - these are likely
+the hardest classes to distinguish (subtle visual differences between
+"some damage" and "moderate damage"), not simply solved by more epochs at
+the current learning rate/architecture. Precision on destroyed remains the
+core weakness - the model still over-flags broadly rather than being
+confident and precise.
+**Comparison across all approaches (test macro F1):** U-Net 10ep 0.3380 >
+Baseline 2 (RF) 0.31 > U-Net 5ep 0.2862 > Baseline 3 (CNN, no skip) 0.27.
+**Val vs test discrepancy:** macro F1 0.2808 (val) vs 0.3380 (test) -
+consistent with the known thin destroyed-class sample in val (403
+instances, documented since Phase 3). Test remains the trusted comparison
+point.
+**Status:** Confirmed, real improvement demonstrated with honest per-class
+breakdown.

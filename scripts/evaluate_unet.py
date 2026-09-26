@@ -4,6 +4,7 @@ Uses the same memory-safe confusion-matrix accumulation as the fixed
 Baseline 3 evaluation script (avoids the earlier ArrayMemoryError).
 """
 import sys
+from xml.parsers.expat import model
 sys.path.insert(0, ".")
 
 import numpy as np
@@ -40,7 +41,7 @@ def evaluate(model, loader, split_name, device):
             if (i + 1) % 50 == 0:
                 print(f"  [{split_name}] {i + 1}/{len(loader)} batches evaluated")
 
-    print(f"\n=== {split_name.upper()} SET RESULTS (U-Net, epoch 5) ===")
+    print(f"\n=== {split_name.upper()} SET RESULTS (U-Net, epoch 10) ===")
     print("Confusion matrix (rows=true, cols=pred):")
     print("Classes:", CLASS_NAMES)
     print(conf_matrix)
@@ -68,7 +69,7 @@ def main():
     print(f"Using device: {device}")
 
     model = UNetResNet18(num_classes=5, pretrained=False).to(device)
-    model.load_state_dict(torch.load("models/unet_epoch5.pt", map_location=device))
+    model.load_state_dict(torch.load("models/unet_epoch10.pt", map_location=device))
 
     val_ds = XBDDataset("val", augment=False)
     test_ds = XBDDataset("test", augment=False)
