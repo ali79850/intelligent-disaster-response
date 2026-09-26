@@ -560,3 +560,11 @@ damage is" correctly but is biased toward the most extreme class once
 triggered, rather than calibrating to actual damage degree. This is a
 more tractable, specific problem than Baseline 3's complete failure to
 localize anything at all.
+## 2026-09 — Phase 7: Grad-CAM Verified
+
+**Finding:** SegmentationGradCAM (adapted for dense per-pixel output,
+region-restricted backprop) verified: correct shape (1024,1024), values
+in [0,1], sensible non-degenerate mean (0.0399 - concentrated activation,
+not uniform or all-zero).
+**Status:** Confirmed. Proceeding to targeted explanation of the specific
+wrong "destroyed" prediction identified in Phase 6 error analysis.
