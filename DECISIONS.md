@@ -489,3 +489,26 @@ persist immediately after every meaningful unit of work, never rely on
 end-of-run saves, and don't trust Drive mounting to work on the first
 attempt - always have a working fallback (direct browser download) ready
 before starting a real run, not improvised after a failure.
+## 2026-09 — Phase 5: U-Net (5 epochs) — Results
+
+**Method:** UNetResNet18, 5 epochs, combined weighted CE + Dice loss,
+batch_size=4, Adam lr=1e-4, trained on Colab T4 GPU.
+**Results (test set):** Macro F1 0.2862 - below Baseline 2 (0.31), modestly
+above Baseline 3 (0.27). Per-class F1: background 0.9584, no-damage 0.1208,
+minor-damage 0.0345, major-damage 0.0512, destroyed 0.2664.
+**Interpretation:** Unlike Baseline 3, this model does NOT collapse - it
+achieves high recall on destroyed (0.8080) and minor-damage (0.2132),
+proving skip connections do let the model detect small/localized damage
+signals that Baseline 3 completely missed. However, precision is poor
+across all damage classes (destroyed precision 0.1595, minor-damage
+precision 0.0187) - the model over-flags damage broadly and confuses
+classes, rather than being cleanly confident. Net effect on macro F1 is
+currently a wash against Baseline 2's simpler approach, but the underlying
+behavior (high recall, low precision) is a more tractable problem than
+Baseline 3's complete failure to detect anything.
+**Not yet conclusive:** Only 5 of a likely-larger needed epoch count.
+Training loss was still decreasing meaningfully at epoch 5 (delta -0.0864,
+epoch 4->5), suggesting the model has not converged. This result should be
+treated as an interim checkpoint, not a final verdict on the architecture.
+**Status:** Confirmed, reported honestly despite not yet beating Baseline 2.
+Continued training planned before drawing final conclusions.
