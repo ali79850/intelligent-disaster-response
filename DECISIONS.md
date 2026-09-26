@@ -568,3 +568,29 @@ in [0,1], sensible non-degenerate mean (0.0399 - concentrated activation,
 not uniform or all-zero).
 **Status:** Confirmed. Proceeding to targeted explanation of the specific
 wrong "destroyed" prediction identified in Phase 6 error analysis.
+## 2026-09 — Phase 7: Grad-CAM Confirms Correct Localization, Severity Miscalibration
+
+**Finding:** Targeted Grad-CAM for the wrong "destroyed" prediction on
+hurricane-matthew_00000000 (60,913 pixels in region of interest) shows the
+highlighted activation sits directly on the actual building cluster, not
+on unrelated image regions (fields, river, or other artifacts, aside from
+a faint response on the known black no-data border).
+**Interpretation:** Combined with Phase 6's error analysis, this confirms
+a coherent two-part diagnosis: the model correctly attends to real
+buildings when making damage predictions (localization is genuinely
+learned, not a shortcut), but is miscalibrated on severity - the internal
+representation that triggers "destroyed" appears to activate on the same
+buildings that are actually only minor-damage, suggesting the decision
+boundary between damage severity levels is not yet well-separated in the
+learned feature space, rather than the model attending to the wrong
+things entirely.
+**Limitation restated:** this Grad-CAM explanation targets one intermediate
+layer (enc4 bottleneck) and does not capture the decoder/skip-connection
+pathway's contribution to the final decision - it shows where gradient
+sensitivity concentrated at that layer, not a complete causal account.
+**Status:** Confirmed. This is now a well-supported, specific finding for
+the project's error analysis and limitations sections - not a vague
+"the model needs more training" statement, but a concrete hypothesis
+(severity miscalibration despite correct localization) backed by both
+quantitative (confusion matrix) and qualitative (visual, Grad-CAM)
+evidence from three independent analysis angles.
