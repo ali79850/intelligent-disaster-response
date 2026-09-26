@@ -537,3 +537,26 @@ instances, documented since Phase 3). Test remains the trusted comparison
 point.
 **Status:** Confirmed, real improvement demonstrated with honest per-class
 breakdown.
+## 2026-09 — Phase 6: Error Analysis — Concrete Failure Cases Identified
+
+**Finding:** Visualized specific test tiles confirm the aggregate confusion
+matrix pattern concretely. hurricane-matthew_00000000: GT has 25,731
+minor-damage pixels, model predicted only 79 (near-total miss), while
+over-predicting destroyed (545 GT vs 61,130 predicted). palu-tsunami_
+00000001: GT has 1,213 major-damage + 1,243 destroyed pixels (small,
+localized), model predicted 61,859 + 86,423 respectively (~50-70x
+over-prediction).
+**Status:** Confirmed via direct tile inspection, not just aggregate
+metrics. Visual inspection of colorized overlay pending to determine
+whether over-prediction is spatially concentrated on real buildings
+(severity-confusion) or scattered (localization failure).
+**Visual confirmation:** hurricane-matthew_00000000 overlay shows the model
+correctly localizes the exact same building cluster as ground truth (error
+map shows a clean building-shaped silhouette, not scattered noise) but
+misclassifies the severity - predicting destroyed (red) where ground truth
+says minor-damage (yellow). This confirms the failure is SEVERITY
+DISCRIMINATION, not spatial localization - the model has learned "where
+damage is" correctly but is biased toward the most extreme class once
+triggered, rather than calibrating to actual damage degree. This is a
+more tractable, specific problem than Baseline 3's complete failure to
+localize anything at all.

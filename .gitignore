@@ -41,9 +41,12 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Reports (generated, not source)
+# Reports (generated, not source) - excluded by default, but error
+# analysis and key evaluation figures are genuine evidence worth tracking
 reports/figures/*
 !reports/figures/.gitkeep
+!reports/figures/error_analysis/
+!reports/figures/error_analysis/*.png
 
 # Logs
 *.log
