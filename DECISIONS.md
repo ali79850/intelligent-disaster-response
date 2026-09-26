@@ -459,3 +459,33 @@ than depending on a private Drive link only the author has access to.
 Phase 3) must re-run each fresh Colab session, since only Google Drive
 persists between sessions, not Colab's local disk.
 **Status:** Confirmed.
+## 2026-09 — Phase 5: Colab GPU Batch Size Selection
+
+**Finding:** Empirical test on Colab T4 (15.64GB VRAM): batch_size=4 uses
+8.52GB peak memory, batch_size=8 uses 14.42GB (92% of total, too tight for
+a safe long run), batch_size=16 causes OutOfMemoryError.
+**Decision:** Use batch_size=4 for full U-Net training - comfortable
+headroom rather than the riskier batch_size=8, given the cost of a crash
+partway through a multi-hour run.
+**Status:** Confirmed.
+## 2026-09 — Phase 5: Colab Training — Infrastructure Lessons
+
+**What happened:** First full U-Net training run (5 epochs, ~35 min total)
+completed successfully but the Colab runtime disconnected/reset before
+checkpoints could be backed up, losing all work. Root causes: (1) Google
+Drive mounting failed repeatedly with "credential propagation unsuccessful"
+- a known Colab auth glitch, (2) a duplicated git clone caused a nested
+directory path bug, (3) the runtime reset entirely, wiping /content/.
+**Fix applied:** Rebuilt in a fresh notebook, verified each cell's output
+before proceeding (rather than running several cells blind), and changed
+the training loop to call files.download() after EVERY epoch rather than
+only at the end - bounding potential data loss to a single epoch (~7 min)
+instead of the full run.
+**Result:** Second full training run completed cleanly, all 5 checkpoints
+saved locally. Final loss 1.5320 (vs. 1.4651 in the lost run - close, not
+identical, expected given no fixed random seed for this training script).
+**Lesson:** For any future long-running Colab session, checkpoint and
+persist immediately after every meaningful unit of work, never rely on
+end-of-run saves, and don't trust Drive mounting to work on the first
+attempt - always have a working fallback (direct browser download) ready
+before starting a real run, not improvised after a failure.
