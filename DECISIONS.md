@@ -669,3 +669,12 @@ azimuth/elevation - these support future photometric/viewing-angle
 analysis if needed, but are not required for core Phase 8 scope.
 **Status:** Confirmed. Proceeding to build tile-level bounding box
 extraction and map visualization.
+## 2026-09 — Phase 8: Damage Map Implemented and Verified
+
+**Finding:** build_damage_map() generates a real Folium map from building
+centroids, verified against hurricane-matthew_00000000: 105 buildings
+plotted (matching Phase 4's polygon utility count exactly), class
+breakdown (minor-damage 97, no-damage 3, destroyed 3, major-damage 2)
+consistent with all prior analysis of this tile (Phase 3 visual overlay,
+Phase 6 error analysis).
+**Status:** Confirmed pending visual browser verification.

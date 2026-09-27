@@ -10,3 +10,4 @@ torchvision
 scipy
 scikit-learn
 pandas
+folium
