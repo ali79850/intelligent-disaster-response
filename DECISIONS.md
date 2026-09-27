@@ -615,3 +615,18 @@ demonstrating the full pipeline (training -> inference -> API -> dashboard)
 is a larger gap than incremental model improvement at this stage.
 **Status:** Confirmed. Items 1 and 2 are prioritized future work if time
 allows after Phase 9-10 are complete; item 3 is longer-term future work.
+## 2026-09 — Phase 9: Inference Engine Implemented and Verified
+
+**Finding:** DamageInferenceEngine (src/inference/engine.py) verified
+against hurricane-matthew_00000000 - destroyed pixel count (61,130)
+matches Phase 6 error analysis exactly, confirming no preprocessing/
+normalization drift between training-time (XBDDataset) and inference-time
+logic.
+**Observation:** Mean confidence for this tile is 0.9552 (high) despite
+the model being confidently WRONG about severity here (Phase 6/7 finding).
+This confirms overall mean confidence is an insufficient uncertainty
+signal on its own - per-class or per-region confidence breakdowns would
+better surface exactly the miscalibration already diagnosed. Noted as a
+consideration for the eventual dashboard's confidence/review-flagging
+feature (per original spec section 12/13), not yet implemented.
+**Status:** Confirmed. Inference engine ready to back an API layer.
