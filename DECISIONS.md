@@ -710,3 +710,46 @@ results dashboard, scoped to exactly what the API currently supports
 (upload, analyze, structured report display) - not the full dashboard
 vision from the original spec, which includes features (map view, review
 workflow, PDF export) not yet built on the backend.
+## 2026-09 — Phase 10: Investigated Apparent Discrepancy — Confirmed Correct
+
+**Finding:** User observed santa-rosa-wildfire_00000137 showing "No Damage"
+at 0% with a non-null confidence (0.27), appearing inconsistent.
+Investigation via direct script call confirmed this is NOT a bug: the
+tile genuinely has 3 no-damage pixels (out of 1,048,576), which rounds to
+0.00% at 2 decimal places but is not truly zero, so the confidence
+guard-clause (mask.sum() > 0) correctly computes a real value. Minor/major
+-damage, which are genuinely 0 pixels, correctly show n/a.
+**Impact:** No backend bug. UI display precision (2 decimals) can make
+very small non-zero pixel counts appear misleadingly as "0%" alongside a
+real confidence value - a legitimate clarity issue for the frontend to
+address (e.g., showing "<0.01%" instead of "0.00%" for tiny non-zero
+counts), not a data correctness issue.
+**Status:** Confirmed correct behavior; UI precision improvement noted.
+## 2026-09 — Phase 10: New Error Pattern Discovered — Vegetation/Burn Confusion
+
+**Finding:** User visually identified apparent fire damage in
+santa-rosa-wildfire_00000137's post-disaster image. Ground truth confirms
+only 2 buildings in this tile, both destroyed (1,412 ground-truth destroyed
+pixels). Model predicted 5,063 destroyed pixels, but only 53 pixels (3.7%)
+overlap with the real destroyed buildings - the model missed 96% of the
+actual destroyed-building pixels and instead flagged ~5,010 pixels
+elsewhere in the tile, almost certainly the visually similar burned/
+discolored vegetation area.
+**Interpretation:** This is a genuinely different, newly discovered failure
+mode from the Phase 6/7 finding (severity confusion among correctly-
+localized buildings). Here, the model appears to react to general visual
+damage/burn-scarring signals (which resemble building destruction
+texturally) rather than specifically building-level damage, and misses
+the actual small building footprints in a landscape dominated by fire-
+affected vegetation. This is conceptually similar to Baseline 1's
+weakness (confusing general visual change with actual damage), suggesting
+the U-Net has not fully escaped this failure mode for fire-disaster tiles
+with sparse building coverage and dominant vegetation change.
+**Significance:** This was found through genuine human review of a model
+result via the dashboard - exactly the human-in-the-loop review workflow
+this project's design anticipates. Credit: identified by direct visual
+inspection of the deployed interface, not by a pre-planned test case.
+**Status:** Confirmed via direct pixel-level ground truth comparison.
+Documented as a real, additional limitation - candidate for future work
+(e.g., additional training on fire-type disasters specifically, or
+explicit vegetation-masking preprocessing).
