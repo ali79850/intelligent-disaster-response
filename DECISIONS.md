@@ -594,3 +594,24 @@ the project's error analysis and limitations sections - not a vague
 (severity miscalibration despite correct localization) backed by both
 quantitative (confusion matrix) and qualitative (visual, Grad-CAM)
 evidence from three independent analysis angles.
+## 2026-09 — Phase 7/8 Transition: Model Improvement Deferred as Future Work
+
+**Decision:** Move to Phase 9 (inference system) rather than continue
+model training/tuning at this point.
+**Considered but deferred:**
+1. Targeted experiment: reduce destroyed-class weight or dice_weight to
+   test whether current class weighting overcorrects and causes the
+   observed destroyed-over-prediction bias (Phase 6/7 finding).
+2. Incorporate xBD tier3 (~17GB supplemental data, same schema/annotation
+   methodology as train, zero cross-dataset reconciliation risk) for
+   greater disaster-event diversity in training.
+3. A second dataset (e.g., RescueNet) for cross-dataset generalization -
+   explicitly rejected as a near-term action due to schema/annotation
+   reconciliation risk and effort; remains a valid long-term extension.
+**Reason for deferring all three:** the project currently has a complete,
+honestly-evaluated model with a well-documented limitation, but zero
+inference/API/dashboard infrastructure. Per the original project scope,
+demonstrating the full pipeline (training -> inference -> API -> dashboard)
+is a larger gap than incremental model improvement at this stage.
+**Status:** Confirmed. Items 1 and 2 are prioritized future work if time
+allows after Phase 9-10 are complete; item 3 is longer-term future work.
