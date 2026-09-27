@@ -699,3 +699,14 @@ engine -> report generation -> JSON response) works correctly with zero
 drift from script-based verification.
 **Status:** Confirmed. Core API endpoints (/api/health, /api/model-info,
 /api/analyze) all verified working.
+## 2026-09 — Phase 10: Frontend Scaffolded
+
+**Decision:** React + TypeScript + Vite + Tailwind CSS, per original spec.
+Scaffolded via `npm create vite@latest . -- --template react-ts`, Tailwind
+installed via the Vite plugin (@tailwindcss/vite), verified working via a
+temporary test class before building real components.
+**Status:** Confirmed. Proceeding to build the actual upload/analyze/
+results dashboard, scoped to exactly what the API currently supports
+(upload, analyze, structured report display) - not the full dashboard
+vision from the original spec, which includes features (map view, review
+workflow, PDF export) not yet built on the backend.
