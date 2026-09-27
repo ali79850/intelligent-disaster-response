@@ -649,3 +649,23 @@ Valuable for the project's final limitations section and for any future
 targeted improvement work (e.g., the deferred class-weighting experiment
 could specifically target improving middle-class calibration).
 **Status:** Confirmed. Report generation ready for API integration.
+## 2026-09 — Phase 8: Geospatial Metadata Verified
+
+**Finding:** Verified hurricane-matthew_00000000's building polygons
+(features.lng_lat) carry genuine real-world coordinates: longitude
+-73.740 to -73.737, latitude 18.196 to 18.198 - confirmed as coastal
+Haiti, consistent with Hurricane Matthew's actual October 2016 landfall
+location and the tile's capture_date metadata (2016-10-09, the exact
+landfall date). This is real georeferencing, not synthetic/relative
+coordinates.
+**Impact:** Phase 8 can legitimately build genuine map-based geospatial
+visualizations (real lat/lon on an actual map, e.g. via Folium), not a
+simplified placeholder. Each building's exact real-world location is
+available, enabling honest damage heatmaps and spatial distribution
+analysis.
+**Also confirmed:** metadata includes gsd (2.77 m/pixel here, consistent
+with Phase 2's documented range), sensor info, off_nadir_angle, sun
+azimuth/elevation - these support future photometric/viewing-angle
+analysis if needed, but are not required for core Phase 8 scope.
+**Status:** Confirmed. Proceeding to build tile-level bounding box
+extraction and map visualization.
