@@ -678,3 +678,24 @@ breakdown (minor-damage 97, no-damage 3, destroyed 3, major-damage 2)
 consistent with all prior analysis of this tile (Phase 3 visual overlay,
 Phase 6 error analysis).
 **Status:** Confirmed pending visual browser verification.
+## 2026-09 — Phase 10: FastAPI Backend Implemented
+
+**Finding:** app/backend/main.py starts cleanly, loads the model once at
+startup (unet_epoch10 on cpu), confirmed via startup log. Fixed a relative-
+path bug where DamageInferenceEngine's default config path assumed being
+run from the project root; resolved using Path(__file__).resolve() to
+build absolute paths regardless of the working directory the server is
+launched from.
+**Status:** Confirmed server starts correctly. Proceeding to test actual
+endpoints.
+## 2026-09 — Phase 10: API Verified End-to-End
+
+**Finding:** POST /api/analyze tested via curl with real image files
+(hurricane-matthew_00000000 pre/post). Response matches every previously
+verified value exactly: destroyed 61,130 pixels, affected_area_percentage
+6.22%, all per-class confidence values, requires_human_review flag and
+flagged classes. Confirms the full stack (HTTP -> file upload -> inference
+engine -> report generation -> JSON response) works correctly with zero
+drift from script-based verification.
+**Status:** Confirmed. Core API endpoints (/api/health, /api/model-info,
+/api/analyze) all verified working.
