@@ -11,3 +11,6 @@ scipy
 scikit-learn
 pandas
 folium
+fastapi
+uvicorn
+python-multipart
