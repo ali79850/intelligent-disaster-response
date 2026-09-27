@@ -630,3 +630,22 @@ better surface exactly the miscalibration already diagnosed. Noted as a
 consideration for the eventual dashboard's confidence/review-flagging
 feature (per original spec section 12/13), not yet implemented.
 **Status:** Confirmed. Inference engine ready to back an API layer.
+## 2026-09 — Phase 9: Report Generation Verified — Refined Diagnosis
+
+**Finding:** generate_report() on hurricane-matthew_00000000 shows
+per-class confidence: background 0.9656, no-damage 0.3927, minor-damage
+0.2506, major-damage 0.4772, destroyed 0.8243. This refines the Phase 6/7
+diagnosis with precision: the model is NOT uniformly uncertain about
+severity - it is specifically, measurably low-confidence on the three
+MIDDLE severity classes (no-damage, minor, major), while being confidently
+(if sometimes wrongly) certain about the extremes (background, destroyed).
+requires_human_review correctly triggers True, flagging exactly these
+three classes.
+**Impact:** This is a more precise, actionable characterization of the
+model's weakness than "severity miscalibration" alone - it specifically
+struggles to distinguish gradations of damage, while reliably
+distinguishing "clearly nothing happened" from "something happened here."
+Valuable for the project's final limitations section and for any future
+targeted improvement work (e.g., the deferred class-weighting experiment
+could specifically target improving middle-class calibration).
+**Status:** Confirmed. Report generation ready for API integration.
