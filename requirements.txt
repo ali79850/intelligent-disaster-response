@@ -9,8 +9,9 @@ torch
 torchvision
 scipy
 scikit-learn
-pandas
 folium
 fastapi
 uvicorn
 python-multipart
+groq
+google-genai

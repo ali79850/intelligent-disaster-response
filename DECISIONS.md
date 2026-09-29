@@ -753,3 +753,25 @@ inspection of the deployed interface, not by a pre-planned test case.
 Documented as a real, additional limitation - candidate for future work
 (e.g., additional training on fire-type disasters specifically, or
 explicit vegetation-masking preprocessing).
+## 2026-09 — Phase 11: LLM Summary Layer Implemented and Verified
+
+**Decision:** Use Groq's free-tier API (openai/gpt-oss-20b) for narrative
+summary generation, not Anthropic's API, per user preference for a
+no-cost option. Verified against Groq's actual account model list via
+direct API call, not documentation alone, after two incorrect model-name
+guesses failed with 404 errors.
+**Bug found and fixed:** Initial implementation returned the model's raw
+internal reasoning trace instead of the final answer, because a fallback
+(`content or reasoning`) silently substituted unintended text when
+`content` came back empty - caused by gpt-oss's default reasoning
+behavior consuming the entire token budget before producing a final
+answer. Fixed by setting `reasoning_format: "hidden"` and
+`reasoning_effort: "low"` via the Groq API, and removing the dangerous
+silent fallback in favor of an explicit error if content is ever empty.
+**Verification:** Tested against hurricane-matthew_00000000's known
+report. Generated summary correctly cites all real numbers (6.22%
+affected, 5.83% destroyed, etc.), correctly explains the human-review
+flag with specific low-confidence classes, includes the required
+disclaimer, and contains zero fabricated content (casualties, population,
+infrastructure) per an automated forbidden-term check.
+**Status:** Confirmed. Ready for API integration.
