@@ -6,6 +6,7 @@ project rule P (version the model, separate training from inference).
 import io
 import sys
 from pathlib import Path
+from pydantic import BaseModel
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -101,3 +102,20 @@ async def analyze(
     result = engine.predict(pre_pil, post_pil)
     report = generate_report(result, tile_id=pre_image.filename or "uploaded_tile")
     return report
+
+from src.llm.summarizer import generate_narrative_summary
+
+
+class SummarizeRequest(BaseModel):
+    report: dict
+
+
+@app.post("/api/summarize")
+async def summarize(request: SummarizeRequest):
+    try:
+        summary = generate_narrative_summary(request.report)
+        return {"summary": summary}
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"LLM summary generation failed: {e}")

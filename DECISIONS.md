@@ -775,3 +775,16 @@ flag with specific low-confidence classes, includes the required
 disclaimer, and contains zero fabricated content (casualties, population,
 infrastructure) per an automated forbidden-term check.
 **Status:** Confirmed. Ready for API integration.
+## 2026-09 — Phase 11: /api/summarize Endpoint Verified
+
+**Finding:** POST /api/summarize tested via real HTTP request using the
+actual hurricane-matthew_00000000 report. Status 200, summary content
+matches the direct script-based test exactly in accuracy and structure.
+Confirms the full stack (FastAPI -> summarizer module -> Groq API ->
+response) works correctly end-to-end.
+**Design note:** Implemented as a separate endpoint from /api/analyze
+(not bundled automatically) so the core ML damage assessment never fails
+or slows down due to the LLM call, an external dependency with its own
+failure modes, being optional and separable per the original spec's
+framing of the LLM layer as an enhancement, not a requirement.
+**Status:** Confirmed. Ready for frontend integration.

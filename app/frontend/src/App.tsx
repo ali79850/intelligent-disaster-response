@@ -136,7 +136,9 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [report, setReport] = useState<DamageReport | null>(null)
   const [error, setError] = useState<string | null>(null)
-
+  const [summary, setSummary] = useState<string | null>(null)
+  const [summaryLoading, setSummaryLoading] = useState(false)
+  const [summaryError, setSummaryError] = useState<string | null>(null)
   const canAnalyze = preFile !== null && postFile !== null && !loading
 
   const handleAnalyze = async () => {
@@ -147,6 +149,8 @@ function App() {
     setLoading(true)
     setError(null)
     setReport(null)
+    setSummary(null)
+    setSummaryError(null)
 
     const formData = new FormData()
     formData.append('pre_image', preFile)
@@ -164,6 +168,28 @@ function App() {
       setError(err instanceof Error ? err.message : 'Analysis failed. Is the API server running?')
     } finally {
       setLoading(false)
+    }
+  }
+   const handleSummarize = async () => {
+    if (!report) return
+    setSummaryLoading(true)
+    setSummaryError(null)
+    try {
+      const res = await fetch(`${API_BASE}/api/summarize`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ report }),
+      })
+      if (!res.ok) {
+        const detail = await res.json().catch(() => null)
+        throw new Error(detail?.detail || `Request failed: ${res.status}`)
+      }
+      const data = await res.json()
+      setSummary(data.summary)
+    } catch (err) {
+      setSummaryError(err instanceof Error ? err.message : 'Summary generation failed.')
+    } finally {
+      setSummaryLoading(false)
     }
   }
 
@@ -287,7 +313,34 @@ function App() {
                 )
               })}
             </div>
-
+            <div className="mb-6">
+              {!summary && (
+                <button
+                  onClick={handleSummarize}
+                  disabled={summaryLoading}
+                  className="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700 disabled:text-slate-400"
+                >
+                  {summaryLoading ? (
+                    <>
+                      <Loader2 size={14} className="animate-spin" /> Generating summary...
+                    </>
+                  ) : (
+                    'Generate Plain-Language Summary'
+                  )}
+                </button>
+              )}
+              {summaryError && (
+                <p className="text-red-600 text-xs mt-2">{summaryError}</p>
+              )}
+              {summary && (
+                <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 text-sm text-slate-700">
+                  <p className="font-semibold text-blue-900 text-xs mb-2 uppercase tracking-wide">
+                    AI-Generated Summary
+                  </p>
+                  <p>{summary}</p>
+                </div>
+              )}
+            </div>
             <details className="text-sm">
               <summary className="cursor-pointer font-semibold text-slate-700 mb-2">
                 Limitations & Disclaimers
