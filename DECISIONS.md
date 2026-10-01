@@ -797,4 +797,28 @@ calculation, limitations always present). All use hand-calculated expected
 values, not placeholder assertions - e.g. test_known_partial_overlap
 verifies precision=2/3 against a manually traced confusion matrix.
 **Status:** Confirmed, 9/9 passing. Proceeding to inference engine and
-API-level tests.
+API-level tests.## 2026-09 — Phase 12: Inference Engine Regression Test
+
+**Finding:** 3 tests for DamageInferenceEngine, including a regression
+test locking in the exact destroyed pixel count (61,130) for
+hurricane-matthew_00000000 - the value independently verified across
+Phases 9-11 via script, curl, and browser UI. All 3 pass (11.44s, real
+model inference, not mocked).
+**Design note:** Tests skip gracefully (pytest.skip) if the model
+checkpoint is missing, since models/*.pt is correctly excluded from git -
+a fresh clone won't have it until trained per REPRODUCIBILITY.md. This
+avoids misleading test failures for legitimate missing-artifact cases.
+**Status:** Confirmed. Proceeding to API-level tests.
+## 2026-09 — Phase 12: API Tests + Lifespan Deprecation Fix
+
+**Finding:** 5 API-level tests via FastAPI TestClient: health check,
+model-info structure, rejection of non-image uploads (400), rejection of
+mismatched pre/post image sizes (400), and full known-tile end-to-end
+(destroyed pixel_count == 61130, requires_human_review == true) - a
+fourth independent confirmation of this value across the project.
+**Also fixed:** @app.on_event("startup") was deprecated in current
+FastAPI; replaced with the lifespan async context manager pattern.
+Confirmed via test suite: all 5 tests still pass, zero deprecation
+warnings remain.
+**Status:** Confirmed. Total test suite: 17 tests across metrics, report
+logic, inference engine, and API layer, all passing.

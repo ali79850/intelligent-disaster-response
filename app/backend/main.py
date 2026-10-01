@@ -6,16 +6,34 @@ project rule P (version the model, separate training from inference).
 import io
 import sys
 from pathlib import Path
+from contextlib import asynccontextmanager
+
 from pydantic import BaseModel
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from PIL import Image
 
 from src.inference.engine import DamageInferenceEngine
 from src.inference.report import generate_report
+from src.llm.summarizer import generate_narrative_summary
+
+# Loaded ONCE at server startup - not per-request
+MODEL_CHECKPOINT = str(PROJECT_ROOT / "models" / "unet_epoch10.pt")
+CONFIG_PATH = str(PROJECT_ROOT / "configs" / "config.yaml")
+engine: DamageInferenceEngine | None = None
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    global engine
+    engine = DamageInferenceEngine(checkpoint_path=MODEL_CHECKPOINT, config_path=CONFIG_PATH)
+    print(f"Model loaded: {engine.model_version} on {engine.device}")
+    yield
+
 
 app = FastAPI(
     title="Intelligent Disaster Response & Damage Assessment API",
@@ -26,6 +44,7 @@ app = FastAPI(
         "and documented limitations."
     ),
     version="0.1.0",
+    lifespan=lifespan,
 )
 
 app.add_middleware(
@@ -34,18 +53,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Loaded ONCE at server startup - not per-request
-MODEL_CHECKPOINT = str(PROJECT_ROOT / "models" / "unet_epoch10.pt")
-CONFIG_PATH = str(PROJECT_ROOT / "configs" / "config.yaml")
-engine: DamageInferenceEngine | None = None
-
-
-@app.on_event("startup")
-def load_model():
-    global engine
-    engine = DamageInferenceEngine(checkpoint_path=MODEL_CHECKPOINT, config_path=CONFIG_PATH)
-    print(f"Model loaded: {engine.model_version} on {engine.device}")
 
 
 @app.get("/api/health")
@@ -102,8 +109,6 @@ async def analyze(
     result = engine.predict(pre_pil, post_pil)
     report = generate_report(result, tile_id=pre_image.filename or "uploaded_tile")
     return report
-
-from src.llm.summarizer import generate_narrative_summary
 
 
 class SummarizeRequest(BaseModel):
