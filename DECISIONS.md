@@ -788,3 +788,13 @@ or slows down due to the LLM call, an external dependency with its own
 failure modes, being optional and separable per the original spec's
 framing of the LLM layer as an enhancement, not a requirement.
 **Status:** Confirmed. Ready for frontend integration.
+## 2026-09 — Phase 12: Unit Tests for Metrics and Report Logic
+
+**Finding:** 9 tests covering segmentation_metrics.py (precision/recall/
+IoU/F1 math, ignore-index handling, zero-division safety) and report.py
+(review-flag triggering, per-class confidence null-handling, affected-area
+calculation, limitations always present). All use hand-calculated expected
+values, not placeholder assertions - e.g. test_known_partial_overlap
+verifies precision=2/3 against a manually traced confusion matrix.
+**Status:** Confirmed, 9/9 passing. Proceeding to inference engine and
+API-level tests.
