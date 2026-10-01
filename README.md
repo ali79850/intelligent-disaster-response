@@ -127,7 +127,7 @@ FastAPI backend, model loaded once at startup via a lifespan context manager.
 
 ## Testing
 
-17 automated tests (`pytest`) across four layers:
+19 automated tests (`pytest`) across four layers::
 - Pure logic (segmentation metrics math, report-generation aggregation) — hand-calculated expected values, not placeholder assertions
 - The real trained model — a regression test locks in an exact, independently-verified prediction value
 - The full API layer via FastAPI's `TestClient`, including validation-rejection cases (not just happy paths)
